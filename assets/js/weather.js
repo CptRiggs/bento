@@ -38,17 +38,19 @@ function setPosition(position) {
 }
 
 function getWeather(latitude, longitude) {
-	let api = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&lang=${CONFIG.language}&appid=${key}`;
+	let api = `https://wttr.in/${latitude},${longitude}?format=j2`
+	let weatherCode = {"113":"01","116":"02","119":"03","122":"04","143":"50","176":"09","179":"13","182":"13","185":"13","200":"11","227":"13","230":"13","248":"50","260":"50","263":"09","266":"09","281":"09","284":"09","293":"09","296":"10","299":"10","302":"10","305":"10","308":"10","311":"09","314":"10","317":"13","320":"13","323":"13","326":"13","329":"13","332":"13","335":"13","338":"13","350":"13","353":"09","356":"10","359":"10","362":"13","365":"13","368":"13","371":"13","374":"13","377":"13","386":"11","389":"11","392":"11","395":"11"}
 	fetch(api)
 		.then(function(response) {
 			let data = response.json();
 			return data;
 		})
 		.then(function(data) {
-			let celsius = Math.floor(data.main.temp - KELVIN);
+			let celsius = Math.floor(data.current_condition[0].temp_C)
 			weather.temperature.value = tempUnit == 'C' ? celsius : (celsius * 9) / 5 + 32;
-			weather.description = data.weather[0].description;
-			weather.iconId = data.weather[0].icon;
+			weather.description = data.current_condition[0].weatherDesc[0].value;
+      let localObsDateTime = data.current_condition[0].localObsDateTime.toString().split(' ');
+			weather.iconId = weatherCode[data.current_condition[0].weatherCode] + (localObsDateTime[localObsDateTime.length - 1] == 'AM' ? 'd' : 'n');
 		})
 		.then(function() {
 			displayWeather();
